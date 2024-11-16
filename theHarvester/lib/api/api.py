@@ -1,5 +1,6 @@
 import argparse
 import os
+import traceback
 
 from fastapi import FastAPI, Header, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response, UJSONResponse
@@ -185,5 +186,5 @@ async def query(
                 'hosts': ahosts,
             }
         )
-    except Exception:
-        return UJSONResponse({'exception': 'Please contact the server administrator to check the issue'})
+    except Exception as e:
+        return UJSONResponse({'exception': traceback.format_exc()})

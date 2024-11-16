@@ -188,43 +188,43 @@ async def start(rest_args: argparse.Namespace | None = None):
     all_ip: list = []
     dnslookup = args.dns_lookup
     dnsserver = args.dns_server  # TODO arg is not used anywhere replace with resolvers wordlist arg dnsresolve
-    dnsresolve = args.dns_resolve
+    # dnsresolve = args.dns_resolve
     final_dns_resolver_list = []
-    if dnsresolve is not None and len(dnsresolve) > 0:
-        # Three scenarios:
-        # 8.8.8.8
-        # 1.1.1.1,8.8.8.8 or 1.1.1.1, 8.8.8.8
-        # resolvers.txt
-        if os.path.exists(dnsresolve):
-            with open(dnsresolve, encoding='UTF-8') as fp:
-                for line in fp:
-                    line = line.strip()
-                    try:
-                        if len(line) > 0:
-                            _ = netaddr.IPAddress(line)
-                            final_dns_resolver_list.append(line)
-                    except Exception as e:
-                        print(f'An exception has occurred while reading from: {dnsresolve}, {e}')
-                        print(f'Current line: {line}')
-                        return
-        else:
-            try:
-                if ',' in dnsresolve:
-                    cleaned = dnsresolve.replace(' ', '')
-                    for item in cleaned.split(','):
-                        _ = netaddr.IPAddress(item)
-                        final_dns_resolver_list.append(item)
-                else:
-                    # Verify user passed in actual IP address does not verify if the IP is a resolver just if an IP
-                    _ = netaddr.IPAddress(dnsresolve)
-                    final_dns_resolver_list.append(dnsresolve)
-            except Exception as e:
-                print(f'Passed in DNS resolvers are invalid double check, got error: {e}')
-                print(f'Dumping resolvers passed in: {e}')
-                sys.exit(0)
+    # if dnsresolve is not None and len(dnsresolve) > 0:
+    #     # Three scenarios:
+    #     # 8.8.8.8
+    #     # 1.1.1.1,8.8.8.8 or 1.1.1.1, 8.8.8.8
+    #     # resolvers.txt
+    #     if os.path.exists(dnsresolve):
+    #         with open(dnsresolve, encoding='UTF-8') as fp:
+    #             for line in fp:
+    #                 line = line.strip()
+    #                 try:
+    #                     if len(line) > 0:
+    #                         _ = netaddr.IPAddress(line)
+    #                         final_dns_resolver_list.append(line)
+    #                 except Exception as e:
+    #                     print(f'An exception has occurred while reading from: {dnsresolve}, {e}')
+    #                     print(f'Current line: {line}')
+    #                     return
+    #     else:
+    #         try:
+    #             if ',' in dnsresolve:
+    #                 cleaned = dnsresolve.replace(' ', '')
+    #                 for item in cleaned.split(','):
+    #                     _ = netaddr.IPAddress(item)
+    #                     final_dns_resolver_list.append(item)
+    #             else:
+    #                 # Verify user passed in actual IP address does not verify if the IP is a resolver just if an IP
+    #                 _ = netaddr.IPAddress(dnsresolve)
+    #                 final_dns_resolver_list.append(dnsresolve)
+    #         except Exception as e:
+    #             print(f'Passed in DNS resolvers are invalid double check, got error: {e}')
+    #             print(f'Dumping resolvers passed in: {e}')
+    #             sys.exit(0)
 
         # if for some reason, there are duplicates
-        final_dns_resolver_list = list(set(final_dns_resolver_list))
+        # final_dns_resolver_list = list(set(final_dns_resolver_list))
 
     engines: list = []
     # If the user specifies
@@ -298,7 +298,7 @@ async def start(rest_args: argparse.Namespace | None = None):
             if source != 'hackertarget' and source != 'pentesttools' and source != 'rapiddns':
                 # If a source is inside this conditional, it means the hosts returned must be resolved to obtain ip
                 # This should only be checked if --dns-resolve has a wordlist
-                if dnsresolve is None or len(final_dns_resolver_list) > 0:
+                if  len(final_dns_resolver_list) > 0:
                     # indicates that -r was passed in if dnsresolve is None
                     full_hosts_checker = hostchecker.Checker(host_names, final_dns_resolver_list)
                     # If full, this is only getting resolved hosts
@@ -967,7 +967,7 @@ async def start(rest_args: argparse.Namespace | None = None):
         print('\n[*] No hosts found.\n\n')
     else:
         db = stash.StashManager()
-        if dnsresolve is None or len(final_dns_resolver_list) > 0:
+        if len(final_dns_resolver_list) > 0:
             temp = set()
             for host in full:
                 if ':' in host:
@@ -1109,7 +1109,7 @@ async def start(rest_args: argparse.Namespace | None = None):
             print(f'\nScreenshots can be found in: {screen_shotter.output}{screen_shotter.slash}')
             start_time = time.perf_counter()
             print('Filtering domains for ones we can reach')
-            if dnsresolve is None or len(final_dns_resolver_list) > 0:
+            if len(final_dns_resolver_list) > 0:
                 unique_resolved_domains = {url.split(':')[0] for url in full if ':' in url and 'www.' not in url}
             else:
                 # Technically not resolved in this case, which is not ideal
@@ -1214,7 +1214,7 @@ async def start(rest_args: argparse.Namespace | None = None):
             if len(all_emails) > 0:
                 json_dict['emails'] = all_emails
 
-            if dnsresolve is None or len(final_dns_resolver_list) > 0 and len(full) > 0:
+            if len(final_dns_resolver_list) > 0 and len(full) > 0:
                 json_dict['hosts'] = full
             elif len(all_hosts) > 0:
                 json_dict['hosts'] = all_hosts
